@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content%}
+    <table class="table table-sm">
+<thead>
+    <th>
+        Name 
+    </th>
+    <th>
+        Status 
+    </th>
+    <th>
+        Creation Date 
+    </th>
+</thead>
+<tr>
+    <td>{{ image.name }}</td>
+    <td>{{ image.status }}</td>
+    <td>{{ image.created_at }}</td>
+</tr>
+    
+
+
+</table>
+
+
+{% endblock %}

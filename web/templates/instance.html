@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <table class="table table-sm">
+        <thead><th class=""><a href="{{ console_url }}" class="btn btn-default">Console</a></th></thead>
+        <tr><td>Name</td> <td>{{ instance.name }}</td></tr>
+        <tr><td>Status</td> <td>{{ instance.status }}</td></tr>
+        <tr><td>Created at</td> <td>{{ created_at }}</td></tr>
+        <tr><td>Host</td> <td>{{ host }}</td></tr>
+        <tr><td>Launched at</td> <td>{{ launched_at }}</td></tr>
+        <tr><td>Up Time</td> <td>{{ uptime }}</td></tr>
+    </table>
+    <h2>
+        Security Groups
+    </h2>
+    <h2><form action="{% url 'instance' instance.id %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="  +  " class="btn btn-default"/>
+    </form> </h2>
+    </tr></table>
+    {%  for secgrp in securitygrps %}
+        <table class="table table-sm">
+            <h3>{{ secgrp.name }}</h3>
+            <thead>
+            <th>From port</th>
+            <th>Ip-range</th>
+            <th>To port</th>
+            <th>Actions</th>
+            </thead>
+            {% for rule in secgrp.rules %}
+                <tr>
+
+                    <td>{{ rule.from_port }}</td>
+                    <td>{{ rule.ip_range.cidr }}</td>
+                    <td>{{ rule.to_port }} </td>
+                    <td><form action="{% url 'deleterule' rule.id instance.id %}" name="deleterule" method="post">
+                        {% csrf_token %}
+                        <input type="submit" value="  -  " class="btn btn-default"/>
+                    </form></td>
+                </tr>
+            {% endfor %}
+                <tr>
+                    <td></td><td></td><td></td>
+                    <td>
+                        <form action="{# add rule action #} %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit" value="  +  " class="btn btn-default"/>
+                    </form>
+                    </td>
+                </tr>
+        </table>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+
+    {% if instances %}
+        <table class="table table-sm">
+
+            <thead>
+            <th>Image Name</th>
+            <th>Status</th>
+            <th>Created at</th>
+            <th>Ip address</th>
+            <th>Action</th>
+            <th></th>
+            </thead>
+            {%  for instance in instances %}
+                <tr>
+                    <td><a href=" {% url 'instance' instance.id %} ">{{ instance.name }}</a></td>
+                    <td>{{ instance.status }}</td>
+                    <td>{{ instance.created }}</td>
+                    <td>{{ instance.addresses.public.0.addr }}</td>
+                    <td>
+                        <form action="" method="post">
+                            {% csrf_token %}
+                            <input id="id_instance_id" maxlength="1000" name="instance_id" type="hidden"
+                                   value="{{ instance.id }}"/>
+                            <div class="btn-group ">
+                                <input type="submit" value="  +  " name="instance_detail" class="btn btn-default"/>
+                                <input type="submit" value="  -  " name="delete_instance" class="btn btn-default"/>
+                                <input type="submit" value="  c  " name="console" class="btn btn-default"/>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    {% if images %}
+        <table class="table table-sm">
+            <thead>
+            <th>Image Name</th>
+            </thead>
+            {%  for image in images %}
+                <tr>
+                    <td><a href=" {% url 'image' image.id %} ">{{ image.name }}</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if hypervisors %}
+    <table class="table table-sm">
+    <thead>
+    <th>Hostname</th>
+    <th>IP address</th>
+    <th>running vms</th>
+    <th>Total Memory</th>
+    <th>Used Memory</th>
+    <th>Total Disk</th>
+    <th>Used Disk</th>
+    <th>VCPUs</th>
+    <th>Used VCPUs</th>
+    </thead>
+    {% for hyper in hypervisors %}
+        <tr>
+        <td>{{ hyper.hypervisor_hostname }}</td>
+        <td>{{ hyper.host_ip }}</td>
+        <td>{{ hyper.running_vms }}</td>
+        <td>{{ hyper.memory_mb }}MB</td>
+        <td>{{ hyper.memory_mb_used }}MB</td>
+        <td>{{ hyper.local_gb }}GB</td>
+        <td>{{ hyper.local_gb_used }}GB</td>
+        <td>{{ hyper.vcpus }}</td>
+        <td>{{ hyper.vcpus_used }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    <table class="table table-sm">
+        <thead>
+        <th>Instance Name</th>
+        <th>VCPUs</th>
+        <th>Disk</th>
+        <th>RAM</th>
+        <th>Last Time Modified</th>
+        </thead>
+
+    </table>
+{% endif %}
+{% endblock %}

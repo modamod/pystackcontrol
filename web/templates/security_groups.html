@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if securitygrps %}
+    <table class="table table-sm">
+    <thead>
+    <th><form action="{% url 'instance' instance.id %}" method="post">
+                            {% csrf_token %}
+                            <input type="submit" value="  +  " class="btn btn-default"/>
+                        </form></th>
+    <th>Name</th>
+    <th>From port</th>
+    <th>Ip-range</th>
+    <th>To port</th>
+    <th></th>
+    </thead>
+        {%  for secgrp in securitygrps %}
+            <tr>
+                <td>{{ secgrp.name }}</td>
+                <td>{{ secgrp.rules.3.from_port }}</td>
+                <td>{{ secgrp.rules.3.ip_range.cidr }}</td>
+                <td>{{ secgrp.rules.3.to_port }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+{% endblock %}
