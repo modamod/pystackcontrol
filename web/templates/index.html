@@ -19,7 +19,7 @@
                     <td>{{ instance.created }}</td>
                     <td>{{ instance.addresses.public.0.addr }}</td>
                     <td>
-                        <form action="" method="post">
+                        <form action="" method="post" name="InstanceDetailForm">
                             {% csrf_token %}
                             <input id="id_instance_id" maxlength="1000" name="instance_id" type="hidden"
                                    value="{{ instance.id }}"/>
@@ -46,4 +46,5 @@
             {% endfor %}
         </table>
     {% endif %}
+
 {% endblock %}

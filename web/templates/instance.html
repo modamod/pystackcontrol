@@ -1,8 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+
     <table class="table table-sm">
-        <thead><th class=""><a href="{{ console_url }}" class="btn btn-default">Console</a></th></thead>
+        <thead>
+        <th class="">
+            <a href="{{ console_url }}" class="btn btn-default">Console</a>
+        </th>
+        </thead>
         <tr><td>Name</td> <td>{{ instance.name }}</td></tr>
         <tr><td>Status</td> <td>{{ instance.status }}</td></tr>
         <tr><td>Created at</td> <td>{{ created_at }}</td></tr>
@@ -10,44 +16,113 @@
         <tr><td>Launched at</td> <td>{{ launched_at }}</td></tr>
         <tr><td>Up Time</td> <td>{{ uptime }}</td></tr>
     </table>
-    <h2>
-        Security Groups
-    </h2>
-    <h2><form action="{% url 'instance' instance.id %}" method="post">
-        {% csrf_token %}
-        <input type="submit" value="  +  " class="btn btn-default"/>
-    </form> </h2>
-    </tr></table>
-    {%  for secgrp in securitygrps %}
-        <table class="table table-sm">
-            <h3>{{ secgrp.name }}</h3>
-            <thead>
-            <th>From port</th>
-            <th>Ip-range</th>
-            <th>To port</th>
-            <th>Actions</th>
-            </thead>
-            {% for rule in secgrp.rules %}
-                <tr>
+    <div id="security_groups">
+        <h2>
+            Security Groups
+        </h2>
+        <h2><form action="{% url 'instance' instance.id %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="  +  " class="btn btn-default"/>
+        </form> </h2>
+        </tr></table>
+        {%  for secgrp in securitygrps %}
+            <div id="{{ secgrp.name }}">
+                <table class="table table-sm">
+                    <h3>{{ secgrp.name }}</h3>
+                    <button class="add_rule_button">   +   </button>
+                    <thead>
+                    <th>Direction</th>
+                    <th>Ip Protocol</th>
+                    <th>Address Type</th>
+                    <th>From port</th>
+                    <th>Ip-range</th>
+                    <th>To port</th>
+                    <th>Actions</th>
+                    </thead>
 
-                    <td>{{ rule.from_port }}</td>
-                    <td>{{ rule.ip_range.cidr }}</td>
-                    <td>{{ rule.to_port }} </td>
-                    <td><form action="{% url 'deleterule' rule.id instance.id %}" name="deleterule" method="post">
-                        {% csrf_token %}
-                        <input type="submit" value="  -  " class="btn btn-default"/>
-                    </form></td>
-                </tr>
-            {% endfor %}
-                <tr>
-                    <td></td><td></td><td></td>
-                    <td>
-                        <form action="{# add rule action #} %}" method="post">
-                        {% csrf_token %}
-                        <input type="submit" value="  +  " class="btn btn-default"/>
-                    </form>
-                    </td>
-                </tr>
-        </table>
-    {% endfor %}
+                    {% for rule in secgrp.security_group_rules %}
+                        <tr>
+                            <td>{{ rule.direction }}</td>
+                            <td>{{ rule.protocol }}</td>
+                            <td>{{ rule.ethertype }}</td>
+                            <td>{{ rule.port_range_min }}</td>
+                            <td>{{ rule.remote_ip_prefix }}</td>
+                            <td>{{ rule.port_range_max }} </td>
+                            <td><form action="{% url 'deleterule' rule.id instance.id %}" name="deleterule" method="post">
+                                {% csrf_token %}
+                                <input type="submit" value="  -  " class="btn btn-default"/>
+                            </form></td>
+                        </tr>
+                    {% endfor %}
+
+                    <div  class="form-group" >
+                        <tr class="addrulesform" id="{{ secgrp.name }}_add_rule_form">
+                            <form action="{% url 'createrule' secgrp.id instance.id %}" method="post" >
+                                {% csrf_token %}
+                                <td>
+                                    <div class="fieldWrapper">
+                                        <label for="{{ form.direction.id_for_label }}">Direction:</label>
+                                        {{ ruleform.direction }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fieldWrapper">
+                                        <label for="{{ form.ethertype.id_for_label }}">Address Type:</label>
+                                        {{ ruleform.ethertype }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fieldWrapper">
+                                        <label for="{{ form.protocol.id_for_label }}">Protocol:</label>
+                                        {{ ruleform.protocol }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fieldWrapper">
+                                        <label for="{{ form.port_range_min.id_for_label }}">From port:</label>
+                                        {{ ruleform.port_range_min }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fieldWrapper">
+                                        <label for="{{ form.remote_ip_prefix.id_for_label }}">IP address:</label>
+                                        {{ ruleform.remote_ip_prefix }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fieldWrapper">
+                                        <label for="{{ form.port_range_max.id_for_label }}">To Port:</label>
+                                        {{ ruleform.port_range_max }}
+                                    </div>
+                                </td>
+                                <td><input type="submit" value="  +  " class="btn btn-default"/></td>
+                            </form>
+                        </tr>
+                    </div>
+                </table>
+            </div>
+        {% endfor %}
+    </div>
+    {% block  scripts%}
+        <script
+                src="https://code.jquery.com/jquery-3.1.1.min.js"
+                integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+                crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $(".addrulesform").hide();
+                $(document).on('click', '.add_rule_button', function (event) {
+                    var div_parent_id = $(this).parents('div').first().attr('id');
+                    console.log('#'+div_parent_id);
+                    $('#'+div_parent_id+'_add_rule_form').fadeIn();
+
+                });
+            });
+        </script>
+
+    {% endblock %}
 {% endblock %}

@@ -5,8 +5,9 @@ from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from datetime import datetime
 
-from stacksession.session import glance, nova
-from web.forms import MyForm, InstanceDetailForm
+from stacksession.session import glance, nova, neutron
+from web.forms import MyForm, InstanceDetailForm, RulesAddForm
+from django.forms import HiddenInput
 
 
 def index(request):
@@ -45,6 +46,13 @@ def image(request, image_id):
 def instance(request, instance_id):
     res = nova.servers.get(instance_id)
     secgrp = nova.servers.list_security_group(res.id)
+    neutronsecres = neutron.list_security_groups()['security_groups']
+    secgrpres = []
+    for s in secgrp:
+        for sn in neutronsecres:
+            if s.id == sn['id']:
+                secgrpres.append(sn)
+
     host = res.__getattr__('OS-EXT-SRV-ATTR:host')
     launch = res.__getattr__('OS-SRV-USG:launched_at')
     created_at = datetime.strptime(res.created, '%Y-%m-%dT%H:%M:%SZ').strftime('%Y-%m-%dT%H:%M:%S')
@@ -53,6 +61,7 @@ def instance(request, instance_id):
              datetime.strptime(launched_at.strftime('%Y-%m-%dT%H:%M:%S'), '%Y-%m-%dT%H:%M:%S')
     console_url = str(res.get_vnc_console('novnc')['console']['url'])
     template = loader.get_template('instance.html')
+    form = RulesAddForm()
     context = {
         'title': "Instance Detail",
         'instance': res,
@@ -61,7 +70,8 @@ def instance(request, instance_id):
         'launched_at': launched_at.strftime('%Y-%m-%dT%H:%M:%S'),
         'uptime': uptime,
         'created_at': created_at,
-        'securitygrps': secgrp,
+        'securitygrps': secgrpres,
+        'ruleform': form
     }
     return HttpResponse(template.render(context, request))
 
@@ -114,5 +124,23 @@ def search(request):
 
 def deleterule(request, rule_id, instance_id):
     if request.method == 'POST':
-        nova.security_group_rules.delete(rule_id)
+        neutron.delete_security_group_rule(rule_id)
+    return redirect('instance', instance_id=instance_id)
+
+def createrule(request, secgrp_id, instance_id):
+    if request.method == 'POST':
+        form = RulesAddForm(request.POST)
+        print form.is_valid()
+        if form.is_valid():
+            security_group_rule = {
+                "direction": form.cleaned_data['direction'].lower(),
+                "port_range_min": form.cleaned_data['port_range_min'],
+                "ethertype": form.cleaned_data['ethertype'].lower(),
+                "port_range_max": form.cleaned_data['port_range_max'],
+                "protocol": form.cleaned_data['protocol'].lower(),
+                "remote_ip_prefix": form.cleaned_data['remote_ip_prefix'],
+                "security_group_id": secgrp_id,
+            }
+            neutron.create_security_group_rule(body={'security_group_rule': security_group_rule})
+            print "Wooooorkkkkkeeeeedd yeeeeeeeeeeyyyy !!!!!!!"
     return redirect('instance', instance_id=instance_id)
