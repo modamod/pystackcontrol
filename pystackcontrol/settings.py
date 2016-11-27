@@ -16,7 +16,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"), os.path.join(BASE_DIR, "django-bootstrap3-templates/bootstrap3/static")
+    os.path.join(BASE_DIR, "static")
 ]
 
 
@@ -60,7 +60,7 @@ ROOT_URLCONF = 'pystackcontrol.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ["", "templates", "django-bootstrap3-templates/bootstrap3/templates", os.path.join(BASE_DIR, 'templates')],
+        'DIRS': ["", "templates", os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
